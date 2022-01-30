@@ -1,14 +1,9 @@
-from rest_framework import routers
 from . import views
+from rest_framework import routers
 from django.urls import path, include
 
-router1 = routers.DefaultRouter()
-router2 = routers.DefaultRouter()
-
-router1.register('questions', views.QuestionViewSet)
-router2.register('answers', views.AnswerViewSet)
-
 urlpatterns = [
-    path('', include(router1.urls)),
-    path('', include(router2.urls)),
+    path('ask', views.CreateQuestionView.as_view(), name='ask'),
+    path('', views.QuestionListView.as_view(), name='questions_list'),
+    path('<pk>', views.QuestionDetailView.as_view(), name='question_detail'),
 ]
