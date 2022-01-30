@@ -23,7 +23,7 @@ class Question(models.Model):
 
 class Answer(models.Model):
     answerer        = models.ForeignKey(MyUser, on_delete=models.CASCADE)
-    question_id     = models.ForeignKey(Question, on_delete=models.CASCADE)
+    question_id     = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers')
     body            = models.TextField()
     created         = models.DateTimeField(auto_now_add=True)
     upvotes         = models.ManyToManyField(MyUser, related_name='upvoters', blank=True)
