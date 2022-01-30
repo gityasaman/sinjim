@@ -15,6 +15,10 @@ class QuestionSerializer(serializers.ModelSerializer, TaggitSerializer):
 
     class Meta:
         model = Question
-        fields = ['title', 'body', 'tags', 'answers']
+        fields = ['title', 'body', 'tags', 'answers', 'created']
 
-
+    def create(self, validated_data):
+        tags = validated_data.pop('tags')
+        instance = super(QuestionSerializer, self).create(validated_data)
+        instance.tags.set(tags)
+        return instance
