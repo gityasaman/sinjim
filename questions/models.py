@@ -1,6 +1,7 @@
 from django.db import models
 from account.models import MyUser
 from taggit.managers import TaggableManager
+from django.utils.text import slugify
 
 class Question(models.Model):
     title           = models.CharField(max_length=160)
@@ -12,9 +13,13 @@ class Question(models.Model):
     tags            = TaggableManager()
     verified_answer = models.ForeignKey('questions.Answer', on_delete=models.CASCADE, blank=True, null=True)
 
-
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        value = self.title
+        self.slug = slugify(value, allow_unicode=True)
+        super().save(*args, **kwargs)
 
 class Answer(models.Model):
     answerer        = models.ForeignKey(MyUser, on_delete=models.CASCADE)
@@ -23,3 +28,7 @@ class Answer(models.Model):
     created         = models.DateTimeField(auto_now_add=True)
     upvotes         = models.ManyToManyField(MyUser, related_name='upvoters', blank=True)
     downvotes       = models.ManyToManyField(MyUser, related_name='downvoters', blank=True)
+
+    def __str__(self):
+        return self.body
+    
