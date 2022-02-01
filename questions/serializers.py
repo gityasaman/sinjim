@@ -12,10 +12,11 @@ class AnswerSerializer(serializers.ModelSerializer):
 class QuestionSerializer(serializers.ModelSerializer, TaggitSerializer):
     tags = TagListSerializerField()
     answers = serializers.StringRelatedField(many=True)
+    upvoters = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Question
-        fields = ['title', 'body', 'tags', 'answers', 'created']
+        fields = ['title', 'body', 'tags', 'answers', 'created', 'upvoters']
 
     def create(self, validated_data):
         tags = validated_data.pop('tags')
