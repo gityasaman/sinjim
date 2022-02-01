@@ -1,13 +1,15 @@
 from rest_framework import serializers
 from .methods import generate_code, send_verification_mail
 from .models import MyUser
+from questions.models import Question, Answer
 
 class MyUserSerializer(serializers.ModelSerializer):
     """Serializers MyUser model"""
+    upvotes = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = MyUser
-        fields = ['first_name', 'last_name', 'username', 'password']
+        fields = ['first_name', 'last_name', 'username', 'password', 'upvotes']
         extra_kwargs = {
             'password': {'write_only': True,
                          'style':{'input_type': 'password'}
