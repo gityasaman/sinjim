@@ -6,4 +6,5 @@ urlpatterns = [
     path('ask', views.CreateQuestionView.as_view(), name='ask'),
     path('', views.QuestionListView.as_view(), name='questions_list'),
     path('<pk>', views.QuestionDetailView.as_view(), name='question_detail'),
+    path('<pk>/upvote', views.UpvoteView.as_view(), name='upvote')
 ]
