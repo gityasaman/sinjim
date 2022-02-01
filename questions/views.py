@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework import generics
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView, View
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from .models import Question, Answer
 from .serializers import QuestionSerializer, AnswerSerializer
 from rest_framework.response import Response
@@ -27,6 +27,7 @@ class QuestionListView(generics.ListAPIView):
 class QuestionDetailView(APIView):
     user = get_user_model()
     serializer_class = AnswerSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request, pk):
         question = get_object_or_404(Question, pk=pk)
@@ -42,6 +43,15 @@ class QuestionDetailView(APIView):
         else:
             return Response(serializer.errors)
 
-class CreateAnswerView(generics.CreateAPIView):
-    serializer_class = AnswerSerializer
-    permission_classes = [IsAuthenticated]
+class UpvoteView(APIView):
+    user = get_user_model()
+
+    def get(self, request, pk):
+        question = Question.objects.get(pk=pk)
+        upvoters = question.upvoters.all()
+        if request.user in upvoters:
+            question.upvoters.remove(request.user)
+            return Response({'message': 'undo upvote'})
+        else:
+            question.upvoters.add(request.user)
+            return Response({'message': 'upvoted'})
