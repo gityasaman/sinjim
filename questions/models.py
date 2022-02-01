@@ -9,7 +9,7 @@ class Question(models.Model):
     body            = models.TextField(blank=True)
     created         = models.DateTimeField(auto_now_add=True)
     questioner      = models.ForeignKey(MyUser, on_delete=models.CASCADE)
-    upvotes         = models.ManyToManyField(MyUser, related_name='voters', blank=True)
+    upvoters        = models.ManyToManyField(MyUser, related_name='upvotes', blank=True)
     tags            = TaggableManager()
     verified_answer = models.ForeignKey('questions.Answer', on_delete=models.CASCADE, blank=True, null=True)
 
