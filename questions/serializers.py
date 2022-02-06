@@ -23,3 +23,8 @@ class QuestionSerializer(serializers.ModelSerializer, TaggitSerializer):
         instance = super(QuestionSerializer, self).create(validated_data)
         instance.tags.set(tags)
         return instance
+
+class VerifyAnswerSerializer(serializers.Serializer):
+    verified_answer = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    
