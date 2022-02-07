@@ -11,7 +11,7 @@ class Question(models.Model):
     questioner      = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     upvoters        = models.ManyToManyField(MyUser, related_name='upvotes', blank=True)
     tags            = TaggableManager()
-    verified_answer = models.ForeignKey('questions.Answer', on_delete=models.CASCADE, blank=True, null=True)
+    verified_answer = models.OneToOneField('questions.Answer', on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return self.title
