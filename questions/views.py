@@ -53,9 +53,9 @@ class QuestionDetailView(APIView):
             else:
                 return Response(serializer.errors)
 
-# class QuestionUpdateView(generics.UpdateAPIView):
-#     serializer_class = QuestionSerializer
-#     queryset = Question.objects.all()
+class QuestionUpdateView(generics.UpdateAPIView):
+    serializer_class = QuestionSerializer
+    queryset = Question.objects.all()
 
 class UpvoteQuestionView(APIView):
     user = get_user_model()
