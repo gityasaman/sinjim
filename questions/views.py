@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from rest_framework import generics
+from rest_framework import generics, mixins
 from rest_framework.views import APIView, View
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from .models import Question, Answer
@@ -35,7 +35,7 @@ class QuestionDetailView(APIView):
     
     def post(self, request, pk):
         question_id = Question.objects.get(pk=pk)
-        if request.user == question_id.questioner:
+        if request.user != question_id.questioner:
             serializer = AnswerSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save(answerer_id=request.user.id, question_id=question_id)   
@@ -43,7 +43,19 @@ class QuestionDetailView(APIView):
             else:
                 return Response(serializer.errors)
         else:
+            print(question_id.questioner)
             serializer = VerifyAnswerSerializer(data=request.data)
+            if serializer.is_valid():
+                answer_id = serializer.validated_data['verified_answer']
+                answer = get_object_or_404(Answer, pk=answer_id)
+                question_id.verified_answer = answer
+                return Response(serializer.data)
+            else:
+                return Response(serializer.errors)
+
+# class QuestionUpdateView(generics.UpdateAPIView):
+#     serializer_class = QuestionSerializer
+#     queryset = Question.objects.all()
 
 class UpvoteQuestionView(APIView):
     user = get_user_model()
