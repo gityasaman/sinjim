@@ -25,6 +25,4 @@ class QuestionSerializer(serializers.ModelSerializer, TaggitSerializer):
         return instance
 
 class VerifyAnswerSerializer(serializers.Serializer):
-    verified_answer = serializers.PrimaryKeyRelatedField(read_only=True)
-
-    
+    verified_answer = serializers.CharField()
