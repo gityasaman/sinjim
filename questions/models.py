@@ -26,8 +26,8 @@ class Answer(models.Model):
     question_id     = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers')
     body            = models.TextField()
     created         = models.DateTimeField(auto_now_add=True)
-    upvotes         = models.ManyToManyField(MyUser, related_name='upvoters', blank=True)
-    downvotes       = models.ManyToManyField(MyUser, related_name='downvoters', blank=True)
+    upvoters         = models.ManyToManyField(MyUser, related_name='answer_upvotes', blank=True)
+    downvoters       = models.ManyToManyField(MyUser, related_name='answer_downvotes', blank=True)
 
     def __str__(self):
         return self.body
