@@ -27,6 +27,12 @@ class QuestionListView(generics.ListAPIView):
 class QuestionDetailView(APIView):
     user = get_user_model()
     permission_classes = [IsAuthenticatedOrReadOnly]
+    
+    def get_object(self, pk):
+        try:
+            return Question.objects.get(pk=pk)
+        except Question.DoesNotExist:
+            raise Http404
 
     def get(self, request, pk):
         question = get_object_or_404(Question, pk=pk)
@@ -34,7 +40,7 @@ class QuestionDetailView(APIView):
         return Response({'question': serializer.data}) 
     
     def post(self, request, pk):
-        question_id = Question.objects.get(pk=pk)
+        question_id = get_object_or_404(Question, pk)
         if request.user != question_id.questioner:
             serializer = AnswerSerializer(data=request.data)
             if serializer.is_valid():
@@ -52,6 +58,11 @@ class QuestionDetailView(APIView):
                 return Response(serializer.data)
             else:
                 return Response(serializer.errors)
+    
+    def delete(self, request, pk, format=None):
+        question = self.get_object(pk)
+        question.delete()
+        return Response({'message': 'deleted successfully'})
 
 class QuestionUpdateView(generics.UpdateAPIView):
     serializer_class = QuestionSerializer
@@ -59,6 +70,7 @@ class QuestionUpdateView(generics.UpdateAPIView):
 
 class UpvoteQuestionView(APIView):
     user = get_user_model()
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         question = Question.objects.get(pk=pk)
@@ -69,3 +81,63 @@ class UpvoteQuestionView(APIView):
         else:
             question.upvoters.add(request.user)
             return Response({'message': 'upvoted'})
+
+class UpvoteAnswerView(APIView):
+    user = get_user_model()
+    queryset = Answer.objects.all()
+    
+    def get(self, request, pk):
+        answer = Answer.objects.get(pk=pk)
+        upvoters = answer.upvoters.all()
+        downvoters = answer.downvoters.all()
+        if request.user in upvoters:
+            answer.upvoters.remove(request.user)
+            return Response({'message': 'Upvote removed'})
+        elif request.user not in upvoters and request.user in downvoters:
+            answer.downvoters.remove(request.user)
+            answer.upvoters.add(request.user)
+            return Response({'message': 'answer upvoted and downvote removed'})
+        else:
+            answer.upvoters.add(request.user)
+            return Response({'message': 'answer upvoted'})
+
+class DownvoteAnswerView(APIView):
+    user = get_user_model()
+    queryset = Answer.objects.all()
+    
+    def get(self, request, pk):
+        answer = Answer.objects.get(pk=pk)
+        upvoters = answer.upvoters.all()
+        downvoters = answer.downvoters.all()
+        if request.user in downvoters:
+            answer.downvoters.remove(request.user)
+            return Response({'message': 'Undo downvote'})
+        elif request.user not in downvoters and request.user in upvoters:
+            answer.upvoters.remove(request.user)
+            answer.downvoters.add(request.user)
+            return Response({'message': 'answer downvoted and upvote removed'})
+        else:
+            answer.downvoters.add(request.user)
+            return Response({'message': 'answer downvoted'})
+
+class AnswerDetailView(APIView):
+    user = get_user_model()
+
+    def get_object(self, pk):
+        try:
+            return Answer.objects.get(pk=pk)
+        except Answer.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk):
+        answer = get_object_or_404(Answer, pk=pk)
+        serializer = AnswerSerializer(answer)
+        return Response(serializer.data)
+    
+    def delete(self, request, pk, format=None):
+        answer = self.get_object(pk)
+        if request.user == answer.answerer:
+            answer.delete()
+            return Response({'message': 'Answer deleted successfully'})
+        else:
+            return Response({'message': 'delete not allowed'})
