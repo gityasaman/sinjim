@@ -1,11 +1,13 @@
 from django.shortcuts import render, get_object_or_404
-from rest_framework import generics, mixins
+from rest_framework import generics, mixins, filters
 from rest_framework.views import APIView, View
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from .models import Question, Answer
 from .serializers import QuestionSerializer, AnswerSerializer, VerifyAnswerSerializer
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+from rest_framework import filters
 
 class CreateQuestionView(generics.CreateAPIView):
     serializer_class = QuestionSerializer
@@ -141,3 +143,17 @@ class AnswerDetailView(APIView):
             return Response({'message': 'Answer deleted successfully'})
         else:
             return Response({'message': 'delete not allowed'})
+
+class QuestionSearchView(generics.ListAPIView):
+    serializer_class = QuestionSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['title', 'body']
+
+    def get_queryset(self):
+        query = self.request.GET.get("search")
+        vector = SearchVector('title', weight='A') + SearchVector('body', weight='B')
+        search_query = SearchQuery(query)
+        rank = SearchRank(vector, query)
+        return Question.objects.annotate(rank=rank).filter(rank__gt=0.3).order_by('-rank')
+    
+    
