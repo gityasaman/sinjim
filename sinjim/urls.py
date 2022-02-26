@@ -16,11 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, register_converter
 from django.urls.converters import SlugConverter
-from rest_framework import routers
 from questions import views
-
-router = routers.DefaultRouter()
-router.register('tags', views.TagViewSet, basename='tags')
 
 class PersianSlugConverter(SlugConverter):
     regex = '[-0123456789-ضصثقفغعهخحجچپشسیبلاتنمکگظطزرذدئوآءإؤژيةۀ]'
@@ -30,5 +26,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('account/', include('account.urls', namespace='account')),
     path('questions/', include('questions.urls')),
-    path('', include(router.urls)),
+    
 ]
