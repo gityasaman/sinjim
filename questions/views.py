@@ -10,6 +10,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from rest_framework import filters
 from taggit.models import Tag
+from rest_framework.decorators import action
 
 class CreateQuestionView(generics.CreateAPIView):
     serializer_class = QuestionSerializer
@@ -29,13 +30,18 @@ class QuestionListView(generics.ListAPIView):
     queryset = Question.objects.all()
 
     def get(self, request, tag_slug=None):
-        tag = None
         if tag_slug:
-            tag = get_object_or_404(Tag, tag_slug)
-            questions = self.queryset.filter(tags__in=[tag])
-            return Response({'questions': questions})
+            tag = get_object_or_404(Tag, slug=tag_slug)
+            questions =  Question.objects.filter(tags__in=[tag])
+            print(tag)
+            print(tag_slug)
+            serializer = QuestionSerializer(questions, many=True)
+            return Response(serializer.data)
         else:
-            return self.queryset
+            questions =  Question.objects.all()
+            serializer = QuestionSerializer(questions, many=True)
+            return Response(serializer.data)
+    
         
 class QuestionDetailView(APIView):
     user = get_user_model()
@@ -170,4 +176,12 @@ class QuestionSearchView(generics.ListAPIView):
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
+    lookup_field = 'slug'
 
+class TagQuestionView(generics.ListAPIView):
+    serializer_class = QuestionSerializer
+
+    def get_queryset(self):
+        tag_slug = self.request.GET.get("tag_slug")
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        return Question.objects.filter(tags__in=[tag])
