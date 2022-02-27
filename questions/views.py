@@ -177,11 +177,3 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
     lookup_field = 'slug'
-
-class TagQuestionView(generics.ListAPIView):
-    serializer_class = QuestionSerializer
-
-    def get_queryset(self):
-        tag_slug = self.request.GET.get("tag_slug")
-        tag = get_object_or_404(Tag, slug=tag_slug)
-        return Question.objects.filter(tags__in=[tag])
