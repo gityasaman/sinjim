@@ -7,7 +7,7 @@ from .models import Question, Answer
 from .serializers import QuestionSerializer, AnswerSerializer, VerifyAnswerSerializer, TagSerializer
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
-from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank, TrigramSimilarity
 from rest_framework import filters
 from taggit.models import Tag
 from rest_framework.decorators import action
@@ -163,6 +163,7 @@ class AnswerDetailView(APIView):
 
 class QuestionSearchView(generics.ListAPIView):
     serializer_class = QuestionSerializer
+    queryset = Question.objects.all()
     filter_backends = [filters.SearchFilter]
     search_fields = ['title', 'body']
 
@@ -177,3 +178,13 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
     lookup_field = 'slug'
+
+class TagSearchView(generics.ListAPIView):
+    serializer_class = TagSerializer
+    queryset = Tag.objects.all()
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name']
+
+    def get_queryset(self):
+        query = self.request.GET.get("search")
+        return Tag.objects.annotate(similarity=TrigramSimilarity('name', query), ).filter(similarity__gt=0.1).order_by('-similarity')
