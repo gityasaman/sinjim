@@ -9,7 +9,8 @@ router.register('', views.TagViewSet, basename='tags')
 
 urlpatterns = [
     path('tags/', include(router.urls)),
-    path('search', views.QuestionSearchView.as_view(), name='search'),
+    path('search', views.QuestionSearchView.as_view(), name='question_search'),
+    path('tags/search', views.TagSearchView.as_view(), name='tag_search'),
     path('ask', views.CreateQuestionView.as_view(), name='ask'),
     path('', views.QuestionListView.as_view(), name='questions_list'),
     path('<slug:tag_slug>', views.QuestionListView.as_view(), name='questions_by_tag'),
