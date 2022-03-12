@@ -5,22 +5,22 @@ from questions.models import Question, Answer
 
 class MyUserSerializer(serializers.ModelSerializer):
     """Serializers MyUser model"""
-    upvotes = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    #upvotes = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = MyUser
-        fields = ['first_name', 'last_name', 'username', 'password', 'upvotes']
+        fields = ['firstname', 'lastname', 'username', 'password']
         extra_kwargs = {
             'password': {'write_only': True,
                          'style':{'input_type': 'password'}
                         }
         }
 
-    def save(self):
-        user = MyUser(first_name=self.validated_data['first_name'],
-                    last_name=self.validated_data['last_name'],
-                    email=self.validated_data['email'],
-                    username=self.validated_data['username'],)
+    def save(self, email, *args, **kwargs):
+        user = MyUser(firstname=self.validated_data['firstname'],
+                      lastname=self.validated_data['lastname'],
+                      email=email,
+                      username=self.validated_data['username'],)
 
         password = self.validated_data['password']
         
