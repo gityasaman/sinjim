@@ -5,11 +5,11 @@ from questions.models import Question, Answer
 
 class MyUserSerializer(serializers.ModelSerializer):
     """Serializers MyUser model"""
-    #upvotes = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    upvotes = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = MyUser
-        fields = ['firstname', 'lastname', 'username', 'password']
+        fields = ['firstname', 'lastname', 'username', 'password', 'upvotes']
         extra_kwargs = {
             'password': {'write_only': True,
                          'style':{'input_type': 'password'}
