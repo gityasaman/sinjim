@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Answer, Question
+from .models import Answer, Question, QuestionTag, TaggedQuestion
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
@@ -11,3 +11,14 @@ class QuestionAdmin(admin.ModelAdmin):
 @admin.register(Answer)
 class AnswerAdmin(admin.ModelAdmin):
     list_display = ['body', 'question_id']
+
+class TaggedItemInline(admin.StackedInline):
+    model = TaggedQuestion
+
+@admin.register(QuestionTag)
+class QuestionTagAdmin(admin.ModelAdmin):
+    inlines = [TaggedItemInline]
+    list_display = ["name", "slug"]
+    ordering = ["name", "slug"]
+    search_fields = ["name"]
+    prepopulated_fields = {"slug": ["name"]}
