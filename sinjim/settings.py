@@ -48,8 +48,6 @@ INSTALLED_APPS = [
     'questions.apps.QuestionsConfig',
     'rest_framework',
     'corsheaders',
-    'rest_framework.authtoken', 
-    'taggit',
     'taggit_serializer',
     'oauth2_provider',
 ]
