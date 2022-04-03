@@ -14,13 +14,19 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include, register_converter
-from django.urls.converters import SlugConverter
+from django.urls import path, include
 from questions import views
 
-class PersianSlugConverter(SlugConverter):
-    regex = '[-0123456789-ضصثقفغعهخحجچپشسیبلاتنمکگظطزرذدئوآءإؤژيةۀ]'
-register_converter(PersianSlugConverter, 'persian_slug')
+class PersianSlugConverter:
+    regex = '^[a-zA-Zضصثقفغعهخحجچپشسیبلاآتنمکگظطزرذدئو-]+$'
+
+    def to_python(self, value):
+        # convert value to its corresponding python datatype
+        return value
+
+    def to_url(self, value):
+        # convert the value to str data 
+        return value
 
 urlpatterns = [
     path('admin/', admin.site.urls),
