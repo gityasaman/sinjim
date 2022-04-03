@@ -2,11 +2,11 @@ from . import views
 from django.urls import path, include, register_converter
 from rest_framework import routers
 from sinjim.urls import PersianSlugConverter
+    
+register_converter(PersianSlugConverter, 'persian_slug')
 
 router = routers.DefaultRouter()
 router.register('', views.TagViewSet, basename='tags')
-
-
 
 urlpatterns = [
     path('tags/', include(router.urls)),
