@@ -30,7 +30,6 @@ class CreateQuestionView(generics.CreateAPIView):
 class QuestionListView(generics.ListAPIView):
     serializer_class = QuestionSerializer
     queryset = Question.objects.all()
-    permission_classes = [AllowAny]
 
     def get(self, request, tag_slug=None):
         if tag_slug:
@@ -85,13 +84,13 @@ class QuestionDetailView(APIView):
         return Response({'message': 'deleted successfully'})
 
 class QuestionUpdateView(generics.UpdateAPIView):
-    permission_classes = [IsAuthenticated, TokenHasScope]
+    permission_classes = [IsAuthenticated]
     serializer_class = QuestionSerializer
     queryset = Question.objects.all()
 
 class UpvoteQuestionView(APIView):
     user = get_user_model()
-    permission_classes = [IsAuthenticated, TokenHasScope]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         question = Question.objects.get(pk=pk)
@@ -106,6 +105,7 @@ class UpvoteQuestionView(APIView):
 class UpvoteAnswerView(APIView):
     user = get_user_model()
     queryset = Answer.objects.all()
+    permission_classes = [IsAuthenticated]
     
     def get(self, request, pk):
         answer = Answer.objects.get(pk=pk)
@@ -125,6 +125,7 @@ class UpvoteAnswerView(APIView):
 class DownvoteAnswerView(APIView):
     user = get_user_model()
     queryset = Answer.objects.all()
+    permission_classes = [IsAuthenticated]
     
     def get(self, request, pk):
         answer = Answer.objects.get(pk=pk)
