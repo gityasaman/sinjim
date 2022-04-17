@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Question, Answer
-from taggit.models import Tag
+from .models import QuestionTag
 from taggit_serializer.serializers import TaggitSerializer, TagListSerializerField
 
 class AnswerSerializer(serializers.ModelSerializer):
@@ -8,7 +8,6 @@ class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
         fields = ['body']
-
 
 class QuestionSerializer(serializers.ModelSerializer, TaggitSerializer):
     tags = TagListSerializerField()
@@ -31,5 +30,5 @@ class VerifyAnswerSerializer(serializers.Serializer):
 class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Tag
+        model = QuestionTag
         fields = ['name']
