@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from django.http import HttpResponseRedirect
 from rest_framework import generics, permissions, status, viewsets, mixins
@@ -40,6 +41,7 @@ r = redis.StrictRedis(host=settings.REDIS_HOST,
 
 class ContinueRegisterView(APIView):
     serializer_class = MyUserSerializer
+    
     def post(self, request, format=None):
         serializer = MyUserSerializer(data=request.data)
         email = request.session['email']
@@ -84,3 +86,11 @@ class CodeView(APIView):
                 return Response({"message":'codes does not match'})
         else:
             return serializer.errors
+
+class UserListView(ListAPIView):
+    serializer_class = MyUserSerializer
+    queryset = MyUser.objects.all()
+
+class UserDetailView(RetrieveAPIView):
+    serializer_class = MyUserSerializer
+    queryset = MyUser.objects.all()
